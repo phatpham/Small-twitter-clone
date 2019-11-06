@@ -1,0 +1,28 @@
+{
+    "user": [
+      {
+        "id": 1,
+        "name": "Phat",
+        "bio": "hallo",
+        "date": "2019-05-30T17:30:31.098Z",
+        "follows": [2],
+        "followedBy": [3]
+      },
+      {
+        "id": 2,
+        "name": "Phat",
+        "bio": "halo2",
+        "date": "2019-05-30T18:39:34.091Z",
+        "follows": [3],
+        "followedBy": [1]
+      },
+      {
+        "id": 3,
+        "name": "Phat",
+        "bio": "halo2",
+        "date": "2019-05-30T19:20:14.298Z",
+        "follows": [1],
+        "followedBy": [2]
+      }
+    ]
+  }
