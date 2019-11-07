@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react'
-import Items from './minorComponents/Items'
-import StatusAdder from './minorComponents/StatusAdder'
-import { Container , Row, Col} from 'react-bootstrap'
+import Timeline from './minorComponents/Timeline'
+import { Container , Row, Col, Form, FormControl, Button} from 'react-bootstrap'
 import userService from '../services/user'
+import tweetService from '../services/tweet'
 import User from './minorComponents/User'
 import '../styling/Content.css'
 
@@ -11,6 +11,9 @@ const Content = () => {
     const [currentAccount, setcurrentAccount] = useState({id:3})
     const [currentAccountFollowings, setcurrentAccountFollowings] = useState([])
     const [currentAccountFollowers, setcurrentAccountFollowers] = useState([])
+    const [displayTweets, setDisplayTweets] = useState([])
+    const [newTweet, setNewTweet] = useState('')
+  
     //Make sure page is re-rendered after the site has received that data
     useEffect(() => {
 
@@ -20,13 +23,14 @@ const Content = () => {
             setcurrentAccount(response)
         })
         .catch(error => {
-            console.log(error)
+            console.log('error')
           })
         
         
 
     }, [])
     
+    //NOT SCALABLE, NEED HEAVY REFACTORING
     useEffect(() => {  
         userService
         .getAll()
@@ -36,24 +40,57 @@ const Content = () => {
         .then(response => {
             setcurrentAccountFollowings(response)
 
-        })
-        .catch(error => console.log('fail'))
+        }).catch(error =>
+            console.log('fail')    
+        )
 
 
         userService
         .getAll()
-        .then(users => users.filter(user => 
-                currentAccount.followedBy.includes(user.id)
+        .then(users => users.filter(
+            user => currentAccount.followedBy.includes(user.id)
         ))
         .then(response => {
             setcurrentAccountFollowers(response)
+        }).catch(error =>
+            console.log('fail')    
+        )
 
-        })
-        .catch(error => console.log('fail'))
-
+        tweetService
+        .getAllTweet()
+        .then(tweets => 
+            tweets.filter (tweet => 
+                currentAccount.followings.concat(currentAccount.id).includes(tweet.userID))
+        )
+        .then(response => {
+            setDisplayTweets(response)
+        }).catch(error =>
+            console.log('fail')    
+        )
 
     }, [currentAccount])
 
+
+    //add tweet by making post call to api
+    const addTweet = (event) => {
+        event.preventDefault()
+        const tweetObject = {
+          content: newTweet,
+          date: new Date().toISOString(),
+          userID: currentAccount.id
+        }
+    
+        userService
+          .create(tweetObject)
+            .then(postedTweet => {
+            setDisplayTweets(displayTweets.concat(postedTweet))
+            setNewTweet('')
+          })
+      }
+
+      const handleStatusChange = (event) => {
+        setNewTweet(event.target.value)
+      }
 
     //Display user
     const theUser = () => {
@@ -68,12 +105,13 @@ const Content = () => {
         )
     }  
     
+    
 
     /*Testing purposes
         * showlist of followers and followings
     */
     const theUser2 = () => {
-        const cont = currentAccountFollowings.map(following =>
+        const cont = [...currentAccountFollowings].map(following =>
             <ul>
                 <User
                     key={following.id}
@@ -92,8 +130,7 @@ const Content = () => {
     
         
     const theUser3 = () => {
-
-        const cont = currentAccountFollowers.map(followers =>
+        const cont = [...currentAccountFollowers].map(followers =>
             <ul>
                 <User
                     key={followers.id}
@@ -116,8 +153,22 @@ const Content = () => {
 
                 <Col className = "sides">{theUser()}</Col>            
                 <Col> 
-                    <StatusAdder />
-                    <Items />
+
+
+                    <div className = 'center'>
+                        <Form>
+                        <Form.Group controlId="exampleForm.ControlTextarea1">
+                            <Form.Label>Enter your status</Form.Label>
+                            <Form.Control as="textarea" rows="3" value={newTweet} onChange={handleStatusChange} />
+                        </Form.Group>
+                        <Button variant="primary" type="submit" onSumbit={addTweet}>
+                            Submit
+                        </Button>
+                        </Form>
+                    </div>
+                    
+
+                    <Timeline tweets={displayTweets}/>
                 </Col >
                 <Col className = "sides">
                 
