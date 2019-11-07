@@ -9,29 +9,52 @@ app.use(cors())
 let users= [
     {
       "id": 1,
-      "name": "Phat",
+      "name": "Phat1",
       "bio": "hallo",
       "date": "2019-05-30T17:30:31.098Z",
-      "follows": [2,3],
+      "followings": [2,3],
       "followedBy": [3]
     },
     {
       "id": 2,
-      "name": "Phat",
+      "name": "Phat2",
       "bio": "halo2",
       "date": "2019-05-30T18:39:34.091Z",
-      "follows": [3],
+      "followings": [3],
       "followedBy": [1]
     },
     {
       "id": 3,
-      "name": "Phat",
+      "name": "Phat3",
       "bio": "halo2",
       "date": "2019-05-30T19:20:14.298Z",
-      "follows": [1],
+      "followings": [1],
       "followedBy": [2]
     }
 ]
+
+let tweets = [
+  {
+    "id":1,
+    "userID":1,
+    "content":"HELLO ITS ME",
+    "date" : "2019-05-30T18:39:34.091Z"
+  },
+  {
+    "id":2,
+    "userID":1,
+    "content":"HELLO ITS THE SECOND ME",
+    "date" : "2019-05-30T18:39:34.091Z"
+  },
+  {
+    "id":3,
+    "userID":3,
+    "content":"REEEEEEEEEEEEEEEEE",
+    "date" : "2019-05-30T18:39:34.091Z"
+  },
+
+]
+
 app.get('/', (req, res) => {
   res.send('<h1>Hello World!</h1>')
 })
@@ -46,6 +69,7 @@ app.get('/users/:id', (request, response) => {
     const user = users.find(user => user.id.toString() === id)
 
     if (user) {    
+        console.log(user)
         response.json(user)  
     } else {    
         response.status(404).end()  

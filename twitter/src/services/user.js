@@ -21,4 +21,13 @@ const update = (id, newObject) => {
   return request.then(response => response.data)
 }
 
-export default { getAll, create, update }
+//Get user
+const getUser = (userId) => {
+  const request = axios.get(`${baseUrl}/${userId}`)
+  return (
+    request
+    .then(response => response.data)
+  )
+}
+
+export default { getAll, create, update , getUser }
