@@ -73,15 +73,18 @@ const Content = () => {
 
     //add tweet by making post call to api
     const addTweet = (event) => {
+        
         event.preventDefault()
         const tweetObject = {
           content: newTweet,
           date: new Date().toISOString(),
           userID: currentAccount.id
         }
-    
-        userService
-          .create(tweetObject)
+        
+        console.log("sssss")
+
+        tweetService
+          .createTweet(tweetObject)
             .then(postedTweet => {
             setDisplayTweets(displayTweets.concat(postedTweet))
             setNewTweet('')
@@ -156,12 +159,12 @@ const Content = () => {
 
 
                     <div className = 'center'>
-                        <Form>
+                        <Form onSubmit={addTweet}>
                         <Form.Group controlId="exampleForm.ControlTextarea1">
                             <Form.Label>Enter your status</Form.Label>
                             <Form.Control as="textarea" rows="3" value={newTweet} onChange={handleStatusChange} />
                         </Form.Group>
-                        <Button variant="primary" type="submit" onSumbit={addTweet}>
+                        <Button variant="primary" type="submit" >
                             Submit
                         </Button>
                         </Form>

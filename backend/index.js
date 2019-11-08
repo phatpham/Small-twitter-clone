@@ -133,6 +133,9 @@ app.delete('/users/:id', (request, response) => {
 })
 
 app.post('/users', (request, response) => {
+
+    const body = request.body
+
     if (!body.content) {
         return response.status(400).json({ 
           error: 'content missing' 
@@ -172,7 +175,7 @@ app.get('/tweets/:id', (request, response) => {
     } 
 })
 
-app.delete('/tweet/:id', (request, response) => {
+app.delete('/tweets/:id', (request, response) => {
     const id = Number(request.params.id)
     tweets = tweets.filter(user => user.id !== id)
   
@@ -180,6 +183,9 @@ app.delete('/tweet/:id', (request, response) => {
 })
 
 app.post('/tweets', (request, response) => {
+    console.log('ss')
+    const body = request.body
+
     if (!body.content) {
         return response.status(400).json({ 
           error: 'content missing' 
@@ -189,7 +195,6 @@ app.post('/tweets', (request, response) => {
     console.log('aaa')
       const tweet = {
         content: body.content,
-        important: body.important || false,
         date: new Date(),
         id: generateTweetID(),
         userID: body.userID,
@@ -199,6 +204,7 @@ app.post('/tweets', (request, response) => {
       response.json(tweets)
 
   })
+
 
 
 
