@@ -1,5 +1,5 @@
 const Hero = require('./hero-model')
-const mongo = require("./mongo");
+const mongo = require("../../mongo");
 
 const ReadPreference = require('mongodb').ReadPreference;
 
@@ -17,9 +17,13 @@ function get(req, res) {
     })
 }
 
-function createUser(req, res) {
-    const { id, bio, date, name, username, password, followings, followedBy} = req.body
-    const user = new Hero({id, bio, date, name, username, password, followings, followedBy})
+async function createUser(req, res) {
+    const { bio, name, username, password, followings, followedBy} = req.body
+    
+    const id = await generateID()
+    const date = new Date()
+    
+    const user = new Hero({ id, bio, date, name, username, password, followings, followedBy})
 
     user.save().then(() =>{
         res.json(user)
@@ -31,11 +35,11 @@ function createUser(req, res) {
 
 
 function updateUser(req,res) {
-    const { id, bio, date, name, followings, followedBy} = req.body
+    const { id, bio, name, followings, followedBy} = req.body
 
     Hero.findOne({id}).then(hero =>{
         hero.bio = bio
-        hero.date = date
+        hero.date = new Date()
         hero.name = name
         hero.followings = followings
         hero.followedBy = followedBy
@@ -72,6 +76,16 @@ function getOneUser(req, res) {
         res.status(500).send(err)
     })
 }
+
+const generateID = async () => {
+    try {
+        const maxId = await Tweet.estimatedDocumentCount();
+        return maxId + 1
+    } catch {
+        console.log('generateID error')
+    }
+}
+
 
 module.exports = {
     get,
