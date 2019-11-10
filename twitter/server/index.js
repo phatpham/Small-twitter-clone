@@ -2,33 +2,15 @@ const express = require('express')
 const app = express()
 const bodyParser = require('body-parser')
 const cors = require('cors')
-const heroService = require('./Models&Schemas/User/hero-service')
-const tweetService = require('./Models&Schemas/Tweets/Tweet-service')
+const loginRouter = require('./Controller/login')
+const heroService = require('./Controller/hero-service')
+const tweetService = require('./Controller/Tweet-service')
 //use json body parser
 app.use(bodyParser.json())
 app.use(cors())
 
-let tweets = [
-  {
-    "id":1,
-    "userID":1,
-    "content":"HELLO ITS ME",
-    "date" : "2019-05-30T18:39:34.091Z"
-  },
-  {
-    "id":2,
-    "userID":1,
-    "content":"HELLO ITS THE SECOND ME",
-    "date" : "2019-05-30T18:39:34.091Z"
-  },
-  {
-    "id":3,
-    "userID":3,
-    "content":"REEEEEEEEEEEEEEEEE",
-    "date" : "2019-05-30T18:39:34.091Z"
-  },
+app.use('/login', loginRouter)
 
-]
 
 app.get('/users', (req, res) => {
   heroService.get(req,res)

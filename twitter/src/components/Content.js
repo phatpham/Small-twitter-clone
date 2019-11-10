@@ -1,16 +1,25 @@
 import React, { useState, useEffect } from 'react'
 import Timeline from './minorComponents/Timeline'
-import { Container , Row, Col, Form, FormControl, Button} from 'react-bootstrap'
+import { Container , Row, Col, Form, FormControl, Button, NavItem, Navbar, Nav,} from 'react-bootstrap'
 import userService from '../services/user'
 import tweetService from '../services/tweet'
 import User from './minorComponents/User'
+import Profile from './Profile'
 import '../styling/Content.css'
 
-const Content = () => {
+const Content = ({ currentUser }) => {
 
-    const [currentAccount, setcurrentAccount] = useState({id:3})
+    const [page, setPage] = useState('home')
+
+    const  toPage = (page) => (event) => {
+       event.preventDefault()
+       setPage(page)
+     }
+
+    const [currentAccount, setcurrentAccount] = useState(currentUser)
     const [currentAccountFollowings, setcurrentAccountFollowings] = useState([])
     const [currentAccountFollowers, setcurrentAccountFollowers] = useState([])
+    
     const [displayTweets, setDisplayTweets] = useState([])
     const [newTweet, setNewTweet] = useState('')
   
@@ -18,7 +27,7 @@ const Content = () => {
     useEffect(() => {
 
         userService
-        .getUser(1)
+        .getUser(currentAccount.id)
         .then(response => {
             setcurrentAccount(response)
         })
@@ -43,16 +52,18 @@ const Content = () => {
         }).catch(error =>
             console.log('fail')    
         )
-
+        
 
         userService
         .getAll()
-        .then(users => users.filter(
-            user => currentAccount.followedBy.includes(user.id)
-        ))
-        .then(response => {
+        .then(users => 
+            users.filter(
+                user => currentAccount.followedBy.includes(user.id)
+            )
+        )
+        .then(response => 
             setcurrentAccountFollowers(response)
-        }).catch(error =>
+        ).catch(error =>
             console.log('fail')    
         )
 
@@ -67,6 +78,9 @@ const Content = () => {
         }).catch(error =>
             console.log('fail')    
         )
+
+        console.log(currentAccountFollowers)
+        console.log(currentAccountFollowings)
 
     }, [currentAccount])
 
@@ -113,44 +127,32 @@ const Content = () => {
     /*Testing purposes
         * showlist of followers and followings
     */
-    const theUser2 = () => {
-        const cont = [...currentAccountFollowings].map(following =>
-            <ul>
-                <User
-                    key={following.id}
-                    user={following}
-                />
-            </ul>
-        )
+        
 
+    const Home = () => {
         return (
             <div>
-                <p> List of following users</p>
-                <div>{cont}</div>
-            </div>
-        )
-    }
-    
-        
-    const theUser3 = () => {
-        const cont = [...currentAccountFollowers].map(followers =>
-            <ul>
-                <User
-                    key={followers.id}
-                    user={followers}
-                />
-            </ul>
-        )
-
-        return (
             <div>
-                <p>List of users following you</p>
-                <div>{cont}</div>
-            </div>
-        )
-    }
+            <Navbar bg="light" expand="lg">
+            <Navbar.Brand href="#home">Twitter</Navbar.Brand>
+            <Navbar.Toggle aria-controls="basic-navbar-nav" />
+            <Navbar.Collapse id="basic-navbar-nav">
+                <Nav className="mr-auto">
+                <NavItem>Profile
+                    <a href="" onClick={toPage('profile')} > Profile </a>
+                </NavItem>
+                
+                </Nav>
+                <Form inline>
+                <FormControl type="text" placeholder="Search" className="mr-sm-2" />
+                <Button variant="outline-success">Search</Button>
+                </Form>
+            </Navbar.Collapse>
+            </Navbar>
+        </div>
+
         
-    return (
+        <div>
         <Container fluid='true'>
             <Row>
 
@@ -175,12 +177,27 @@ const Content = () => {
                 </Col >
                 <Col className = "sides">
                 
-                    <Row>{theUser2()}</Row>
-                    <Row>{theUser3()}</Row>
                 
                 </Col>   
             </Row>
         </Container>
+        </div>
+        </div>
+        )
+    }
+
+    const content = () => {
+        if (page === 'home') {
+          return <Home />
+        } else if (page === 'profile') {
+          return <Profile user={currentAccount} followers={currentAccountFollowers} followings={currentAccountFollowings}/>
+        } 
+    }
+
+    return (
+        <div>
+            {content()}
+        </div>
     )
 }
 
