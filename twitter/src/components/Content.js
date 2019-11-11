@@ -1,24 +1,22 @@
 import React, { useState, useEffect } from 'react'
 import Timeline from './minorComponents/Timeline'
-import { Container , Row, Col, Form, FormControl, Button, NavItem, Navbar, Nav,} from 'react-bootstrap'
+import Profile from './Profile'
+import { Container , Row, Col, Form, Button, NavItem, Navbar, Nav,} from 'react-bootstrap'
 import userService from '../services/user'
 import tweetService from '../services/tweet'
-import User from './minorComponents/User'
-import Profile from './Profile'
 import '../styling/Content.css'
 
 const Content = ({ currentUser }) => {
 
     const [page, setPage] = useState('home')
 
-    const  toPage = (page) => (event) => {
+    const toPage = (page) => (event) => {
        event.preventDefault()
        setPage(page)
      }
 
     const [currentAccount, setcurrentAccount] = useState(currentUser)
-    const [currentAccountFollowings, setcurrentAccountFollowings] = useState([])
-    const [currentAccountFollowers, setcurrentAccountFollowers] = useState([])
+
     
     const [displayTweets, setDisplayTweets] = useState([])
     const [newTweet, setNewTweet] = useState('')
@@ -39,34 +37,8 @@ const Content = ({ currentUser }) => {
 
     }, [])
     
-    //NOT SCALABLE, NEED HEAVY REFACTORING
+    //Get list of suitable tweets to display
     useEffect(() => {  
-        userService
-        .getAll()
-        .then(users => users.filter(user => 
-                currentAccount.followings.includes(user.id)
-        ))
-        .then(response => {
-            setcurrentAccountFollowings(response)
-
-        }).catch(error =>
-            console.log('fail')    
-        )
-        
-
-        userService
-        .getAll()
-        .then(users => 
-            users.filter(
-                user => currentAccount.followedBy.includes(user.id)
-            )
-        )
-        .then(response => 
-            setcurrentAccountFollowers(response)
-        ).catch(error =>
-            console.log('fail')    
-        )
-
         tweetService
         .getAllTweet()
         .then(tweets => 
@@ -79,8 +51,6 @@ const Content = ({ currentUser }) => {
             console.log('fail')    
         )
 
-        console.log(currentAccountFollowers)
-        console.log(currentAccountFollowings)
 
     }, [currentAccount])
 
@@ -102,6 +72,7 @@ const Content = ({ currentUser }) => {
             .then(postedTweet => {
             setDisplayTweets(displayTweets.concat(postedTweet))
             setNewTweet('')
+            .catch(err => console.log('error here'))
           })
       }
 
@@ -113,20 +84,16 @@ const Content = ({ currentUser }) => {
     const theUser = () => {
         return(
             <ul>
-            <User
-                key={currentAccount.id}
-                user={currentAccount}
-            />
+            <li>
+                {currentAccount.name}
+            </li>
+                
 
         </ul>
         )
     }  
     
-    
-
-    /*Testing purposes
-        * showlist of followers and followings
-    */
+  
         
 
     const Home = () => {
@@ -136,17 +103,16 @@ const Content = ({ currentUser }) => {
             <Navbar bg="light" expand="lg">
             <Navbar.Brand href="#home">Twitter</Navbar.Brand>
             <Navbar.Toggle aria-controls="basic-navbar-nav" />
-            <Navbar.Collapse id="basic-navbar-nav">
-                <Nav className="mr-auto">
-                <NavItem>Profile
-                    <a href="" onClick={toPage('profile')} > Profile </a>
+            <Navbar.Collapse id="basic-navbar-nav" className="justify-content-end">
+                <Nav >
+                <NavItem style={{paddingLeft:5}}>
+                    <a href="" onClick={toPage('profile')} style={{color:'black'}} >Profile   </a>
                 </NavItem>
-                
+                <NavItem>
+                    <p style={{paddingHorizontal:5}} >{currentAccount.name}</p>
+                </NavItem>
                 </Nav>
-                <Form inline>
-                <FormControl type="text" placeholder="Search" className="mr-sm-2" />
-                <Button variant="outline-success">Search</Button>
-                </Form>
+
             </Navbar.Collapse>
             </Navbar>
         </div>
@@ -186,17 +152,17 @@ const Content = ({ currentUser }) => {
         )
     }
 
-    const content = () => {
+    const body = () => {
         if (page === 'home') {
           return <Home />
         } else if (page === 'profile') {
-          return <Profile user={currentAccount} followers={currentAccountFollowers} followings={currentAccountFollowings}/>
+            return <Profile user={currentAccount} displayUser={currentAccount}/>
         } 
     }
 
     return (
         <div>
-            {content()}
+            {body()}
         </div>
     )
 }

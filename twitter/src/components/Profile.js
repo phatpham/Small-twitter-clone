@@ -1,10 +1,11 @@
 import React, { useState, useEffect} from 'react'
-import User from './minorComponents/User'
 import avatar from '../images/avatar.jpg'
 import background from '../images/css-lattice-pattern.png'
-import { Container , Row, Col, Form, FormControl, Button, NavItem, Navbar, Nav,} from 'react-bootstrap'
+import { Container , Row, Col, NavItem, Button, Navbar, Nav,} from 'react-bootstrap'
+import userService from '../services/user'
+import Content from './Content'
 
-const Profile = ({user,followers,followings}) => {
+const Profile = ({user, displayUser}) => {
 
     //Current page state
     const [page, setPage] = useState('profile')
@@ -15,73 +16,149 @@ const Profile = ({user,followers,followings}) => {
        event.preventDefault()
        setPage(page)
      }
+    
+    const [currentDisplayUser, setDisplayUser] = useState(displayUser)
+    const newProf = (newDisplay) =>  {
+        const handler= () => {
+            console.log(user)
+            setDisplayUser(newDisplay)
+        }
+        return handler
+    }
+ 
+    
+     //Back to home page
+     const home = () => {
+        return <Content currentUser={user}/>
+    }
 
     
     //Current account stage. and list of followers/followings
-    const [currentAccount, setcurrentAccount] = useState(user)
-    const [currentAccountFollowings, setcurrentAccountFollowings] = useState(followings)
-    const [currentAccountFollowers, setcurrentAccountFollowers] = useState(followers)
-     
+    const [currentDisplayUserFollowings, setcurrentDisplayUserFollowings] = useState([{id:-1}])
+    const [currentDisplayUserFollowers, setcurrentDisplayUserFollowers] = useState([{id:-1}])
+    const [currentDisplayUserNotFollowings, setcurrentDisplayUserNotFollowings] = useState([{id:-1}])
+    
+    useEffect(() => {  
+        userService
+        .getAll()
+        .then(users => users.filter(user => 
+            currentDisplayUser.followings.includes(user.id)
+        ))
+        .then(response => {
+            setcurrentDisplayUserFollowings(response)
+
+        }).catch(error =>
+            console.log('fail')    
+        )
+        
+
+        userService
+        .getAll()
+        .then(users => 
+            users.filter(
+                user => currentDisplayUser.followedBy.includes(user.id)
+            )
+        )
+        .then(response => 
+            setcurrentDisplayUserFollowers(response)
+        ).catch(error =>
+            console.log('fail')    
+        )
+
+        userService
+        .getAll()
+        .then(users => 
+            users.filter(
+                user => !(currentDisplayUser.followings.includes(user.id))
+            )
+        )
+        .then(response => 
+            setcurrentDisplayUserNotFollowings(response)
+        ).catch(error =>
+            console.log('fail')    
+        )
+    }, [currentDisplayUser])
+
+
+    
     const listOfFollowings = () => {
-        const cont = [...currentAccountFollowings].map(following =>
-            <ul>
-                <User
-                    key={following.id}
-                    user={following}
-                />
-            </ul>
+        const cont = [...currentDisplayUserFollowings].map(following =>
+                <li className='user'>
+                    <a href="#" onClick={newProf(following)} >{following.name}</a>
+                </li>
         )
 
         return (
             <div>
                 <p> List of following users</p>
-                <div>{cont}</div>
+                <ul>{cont}</ul>
             </div>
         )
     }
     
     
     const listOfFollowers = () => {
-        const cont = [...currentAccountFollowers].map(followers =>
-            <ul>
-                <User
-                    key={followers.id}
-                    user={followers}
-                />
-            </ul>
+        const cont = [...currentDisplayUserFollowers].map(follower =>
+                <li className='user'>
+                    <a href="#" onClick={newProf(follower)} >{follower.name}</a>
+                </li>
         )
 
         return (
             <div>
                 <p>List of users following you</p>
-                <div>{cont}</div>
+                <ul>{cont}
+                </ul>
             </div>
         )
     }
-   
+    
+    const suggestFollowing = () => {
+        const cont = [...currentDisplayUserNotFollowings].map(follower =>
+            <li className='user'>
+                <a href="#" onClick={newProf(follower)} >{follower.name}</a>
+            </li>
+    )
+
+    return (
+        <div>
+            <p>List of users you are currently not following</p>
+            <ul>{cont}
+            </ul>
+        </div>
+    )
+    }
+    
+    const followButton = () => {
+        const addFollow = () => {
+            userService.update({...user, followings: user.followings.concat(currentDisplayUser.id)})
+            userService.update({...currentDisplayUser, followedBy: currentDisplayUser.followedBy.concat(user.id)})
+        }
+        return (
+            <Button onClick={addFollow}>
+                Follow
+            </Button>
+        )
+    }
     const bio = () => {
         return(
         <div style={{backgroundImage:{background}}}>
         <div>
             <Navbar bg="light" expand="lg">
-            <Navbar.Brand href="#home">Twitter</Navbar.Brand>
+            <Navbar.Brand href="#home" onClick={toPage('home')}>Twitter</Navbar.Brand>
             <Navbar.Toggle aria-controls="basic-navbar-nav" />
-            <Navbar.Collapse id="basic-navbar-nav">
+            <Navbar.Collapse id="basic-navbar-nav" className="justify-content-end">
                 <Nav className="mr-auto">
-                <NavItem>Profile
-                    <a href="" onClick={toPage('profile')} > Profile </a>
+                <NavItem>
+                    <a href="" onClick={toPage('profile')} style={{color:'black'}} > Profile </a>
                 </NavItem>
                 
                 </Nav>
-                <Form inline>
-                <FormControl type="text" placeholder="Search" className="mr-sm-2" />
-                <Button variant="outline-success">Search</Button>
-                </Form>
             </Navbar.Collapse>
             </Navbar>
         </div>
             <Container>
-                <Row>
+                <Row >
                     <Col>
                         <Row >
                             <p style = {{textAlign:'center'}}>Avatar</p>
@@ -93,24 +170,23 @@ const Profile = ({user,followers,followings}) => {
                     </Col>
                     <Col>
                         <div>
-                            {currentAccount.name}
-                            <p>Joined {currentAccount.date}</p>
-                            <p>{currentAccountFollowings.length} followings</p>
-                            <p>{currentAccountFollowers.length} followers</p>
+                            {currentDisplayUser.name}
+                            <p>Joined {currentDisplayUser.date}</p>
+                            <p>{currentDisplayUserFollowings.length} followings</p>
+                            <p>{currentDisplayUserFollowers.length} followers</p>
+                            {user.id !== currentDisplayUser.id && !(user.followings.includes(currentDisplayUser.id)) && followButton()}
                         </div>
                     </Col>
                 </Row>
                 <Row>
                     <Col>
-                    List of followers
-                    {listOfFollowers}
+                    {listOfFollowers()}
                     </Col>
                     <Col>
-                    List of followings
-                    {listOfFollowings}
+                    {listOfFollowings()}
                     </Col>
                     <Col>
-                    You might want to follow
+                    {suggestFollowing()}
                     </Col>
                 </Row>
             </Container>
@@ -120,7 +196,8 @@ const Profile = ({user,followers,followings}) => {
 
     return (
         <div>
-        {bio()}
+        {page === 'profile'? bio():home()}
+        
         </div>
     )
 }

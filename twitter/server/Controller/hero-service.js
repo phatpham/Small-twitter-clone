@@ -18,9 +18,11 @@ function get(req, res) {
 }
 
 async function createUser(req, res) {
-    const { bio, name, username, password, followings, followedBy} = req.body
-    
+    const {name, username, password} = req.body
+    const bio = ''
     const date = new Date()
+    const followings = []
+    const followedBy = []
     Hero.estimatedDocumentCount()
     .then(
         id => new Hero({ id, bio, date, name, username, password, followings, followedBy})
@@ -43,10 +45,11 @@ function updateUser(req,res) {
 
     Hero.findOne({id}).then(hero =>{
         hero.bio = bio
-        hero.date = new Date()
         hero.name = name
         hero.followings = followings
         hero.followedBy = followedBy
+        hero.password = hero.password
+        hero.username = hero.username
         hero.save()
         .then(() => {
             res.json(hero)

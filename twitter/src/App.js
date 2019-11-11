@@ -1,15 +1,21 @@
 import React, { useState, useEffect } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import { Alert, Container, Row, Col } from 'react-bootstrap'
 import Content from './components/Content'
 import userService from './services/user'
 import loginServ from './services/login'
-const App = () => {
+const App = () => { 
+  document.body.style.backgroundColor = "	#F5F5DC";
 
   const [username, setUsername] = useState('') 
   const [password, setPassword] = useState('') 
   const [user, setUser] = useState({id:-1})
 
+  const [nameRegister, setNameRegister] = useState('')
+  const [usernameRegister, setUsernameRegister] = useState('')
+  const [passwordRegister, setPasswordRegister] = useState('')
 
+  const [errorNotification, setErrorNotification] =useState('')
   //Need changes
   useEffect(() => {
     const loggedUserJSON = window.localStorage.getItem('loggedNoteappUser')
@@ -37,13 +43,35 @@ const App = () => {
       setUsername('')
       setPassword('')
     } catch (exception) {
-      //To implement
+      notification('Wrong login details')
     }
   }
 
+  const handleRegister = async (event) => {
+    event.preventDefault()
+    console.log('aa')
+    try { 
+        await userService.create({username:usernameRegister, password:passwordRegister, name: nameRegister})
+        setUsernameRegister('')
+        setPasswordRegister('')
+        setNameRegister('')
+        notification('Account created. Please log in')
+      } catch (exception) {
+       notification('Username taken')
+    }
+
+  }
+
+  const notification = (error) => {
+    setErrorNotification(error)
+  }
+
   const loginForm = () => {
-    return (
-      <form onSubmit={handleLogin}>
+    const login = () => {
+      return (
+        <div>
+        <p>Login to your account</p>
+        <form onSubmit={handleLogin}>
         <div>
           username
             <input
@@ -63,7 +91,72 @@ const App = () => {
           />
         </div>
         <button type="submit">login</button>
+      </form>
+      </div>   
+      )
+    }
+
+    const errorDisplay = () => {
+      return (
+        <Alert variant='danger'>
+            {errorNotification}
+          </Alert>
+      )
+    }
+
+    const register = () => {
+      return(
+      <form onSubmit={handleRegister}>
+        Register a new account
+        <div>
+          username
+            <input
+            type="text"
+            value={usernameRegister}
+            name="Username"
+            onChange={({ target }) => setUsernameRegister(target.value)}
+          />
+        </div>
+        <div>
+          password
+            <input
+            type="password"
+            value={passwordRegister}
+            name="Password"
+            onChange={({ target }) => setPasswordRegister(target.value)}
+          />
+        </div>
+        <div>
+          name
+            <input
+            type="text"
+            value={nameRegister}
+            name="name"
+            onChange={({ target }) => setNameRegister(target.value)}
+          />
+        </div>
+        <button type="submit">Register</button>
       </form>   
+      )
+    }
+    return (
+      <div>
+        <Container>
+          <Row>
+            <h3 style={{alignContent:'center', width:'50%'}}>Twitter clone</h3>
+          </Row>
+          <Row>
+            <Col>
+            {login()}
+            </Col>
+            <Col>
+            {register()}
+            </Col>
+          </Row>
+        </Container>
+
+        {errorNotification !== '' && errorDisplay()}
+      </div>
     )  
   }
 
