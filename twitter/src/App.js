@@ -18,11 +18,11 @@ const App = () => {
   const [errorNotification, setErrorNotification] =useState('')
   //Need changes
   useEffect(() => {
-    const loggedUserJSON = window.localStorage.getItem('loggedNoteappUser')
+    const loggedUserJSON = window.localStorage.getItem('loggedInUser')
     if (loggedUserJSON) {
       const user = JSON.parse(loggedUserJSON)
-      setUser(user)
       userService.setToken(user.token)
+      setUser(user)
     }
   }, [])
 
@@ -35,7 +35,7 @@ const App = () => {
 
       console.log(userr)
       window.localStorage.setItem(
-        'loggedNoteappUser', JSON.stringify(userr)
+        'loggedInUser', JSON.stringify(userr)
       ) 
       userService.setToken(userr.token)
       console.log(userr)

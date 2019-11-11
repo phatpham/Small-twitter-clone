@@ -90,7 +90,7 @@ const Content = ({ currentUser }) => {
             <Navbar.Collapse id="basic-navbar-nav" className="justify-content-end">
                 <Nav >
                 <NavItem style={{padding:3}}>
-                    <a href="" onClick={toPage('profile')} style={{color:'black'}} >Profile   </a>
+                    <a href="" onClick={toPage('profile')} style={{color:'black'}} >Profile      -</a>
                 </NavItem>
                 <NavItem>
                     <p style={{padding:3}} >Logged In User: {currentAccount.name}</p>
