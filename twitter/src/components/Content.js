@@ -80,22 +80,6 @@ const Content = ({ currentUser }) => {
         setNewTweet(event.target.value)
       }
 
-    //Display user
-    const theUser = () => {
-        return(
-            <ul>
-            <li>
-                {currentAccount.name}
-            </li>
-                
-
-        </ul>
-        )
-    }  
-    
-  
-        
-
     const Home = () => {
         return (
             <div>
@@ -105,11 +89,11 @@ const Content = ({ currentUser }) => {
             <Navbar.Toggle aria-controls="basic-navbar-nav" />
             <Navbar.Collapse id="basic-navbar-nav" className="justify-content-end">
                 <Nav >
-                <NavItem style={{paddingLeft:5}}>
+                <NavItem style={{padding:3}}>
                     <a href="" onClick={toPage('profile')} style={{color:'black'}} >Profile   </a>
                 </NavItem>
                 <NavItem>
-                    <p style={{paddingHorizontal:5}} >{currentAccount.name}</p>
+                    <p style={{padding:3}} >Logged In User: {currentAccount.name}</p>
                 </NavItem>
                 </Nav>
 
@@ -122,7 +106,7 @@ const Content = ({ currentUser }) => {
         <Container fluid='true'>
             <Row>
 
-                <Col className = "sides">{theUser()}</Col>            
+                <Col className = "sides"></Col>            
                 <Col> 
 
 

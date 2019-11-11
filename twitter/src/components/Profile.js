@@ -145,15 +145,18 @@ const Profile = ({user, displayUser}) => {
         <div style={{backgroundImage:{background}}}>
         <div>
             <Navbar bg="light" expand="lg">
-            <Navbar.Brand href="#home" onClick={toPage('home')}>Twitter</Navbar.Brand>
+            <Navbar.Brand href="#home">Twitter</Navbar.Brand>
             <Navbar.Toggle aria-controls="basic-navbar-nav" />
             <Navbar.Collapse id="basic-navbar-nav" className="justify-content-end">
-                <Nav className="mr-auto">
-                <NavItem>
-                    <a href="" onClick={toPage('profile')} style={{color:'black'}} > Profile </a>
+                <Nav >
+                <NavItem style={{padding:3}}>
+                    <a href="" onClick={toPage('profile')} style={{color:'black'}} >Profile   </a>
                 </NavItem>
-                
+                <NavItem>
+                    <p style={{padding:3}} >Logged In User: {user.name}</p>
+                </NavItem>
                 </Nav>
+
             </Navbar.Collapse>
             </Navbar>
         </div>
